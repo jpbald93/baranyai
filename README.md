@@ -9,7 +9,7 @@ The proof is Baranyai's vertex-by-vertex induction. The integral step uses Hall'
 theorem from Mathlib, with Hall's condition derived by double counting from the fractional
 assignment, so no max-flow integrality theorem is needed.
 
-**Status:** all statements are proved with no `sorry`. `gate.sh` checks 31 named declarations.
+**Status:** all statements are proved with no `sorry`. `gate.sh` checks 32 named declarations.
 
 ## Main statements
 
@@ -24,13 +24,14 @@ assignment, so no max-flow integrality theorem is needed.
 | `Baranyai.baranyai_finset` | `Transport.lean` | `baranyai` for the vertex set of a `Finset` |
 | `Baranyai.factorisation_congr` | `Transport.lean` | factorisations transport along a bijection `α ≃ β` |
 | `Baranyai.baranyai_partition` | `Partition.lean` | the colouring is a genuine partition: blocks of one colour are disjoint, colour classes are pairwise disjoint and cover all `k`-subsets, each class has `n/k` blocks, and the number of classes is `C(n,k)/(n/k)` |
+| `Baranyai.dvd_card_of_factorisation` | `Partition.lean` | converse: if one colour class covers every vertex exactly once, then `k ∣ |α|` (so `k ∣ n` is necessary) |
 
 `Transport.lean` and `Partition.lean` derive these from the statement of `baranyai`. They do
 not reprove it.
 
 ## Verification
 
-- `./gate.sh` builds the library and generates its own `#print axioms` queries for the 31
+- `./gate.sh` builds the library and generates its own `#print axioms` queries for the 32
   named declarations: every public theorem and definition in the library, fully qualified. The
   queries come from the gate itself, not from a file in the repository. The gate fails if:
   - a source file contains `sorry`, `admit`, `native_decide`, `axiom`, `#eval`, `run_cmd`,
@@ -40,7 +41,7 @@ not reprove it.
   - a named declaration depends on anything other than `propext`, `Classical.choice` and
     `Quot.sound`.
 
-  On success it prints `PASS (31 declarations, standard axioms only)`.
+  On success it prints `PASS (32 declarations, standard axioms only)`.
 - `bash tests/tamper.sh` plants six kinds of fake proof in scratch copies and checks that the
   gate rejects each one:
   1. a `sorry`;
@@ -61,7 +62,10 @@ not reprove it.
   It shows that the hypotheses can be met together and that the conclusions are not vacuous.
 
 `code/check_baranyai.py` builds factorisations independently by the same induction (in
-Python) and verifies them. `scratch/Ax.lean` and `scratch/ax.out` are the `#print axioms` runs
+Python) and verifies them. `lake env lean scratch/Referee.lean` runs the referee checks: no
+two-colour factorisation exists for `n = 3`, `k = 2` (by `decide`); the hypotheses of
+`Baranyai.step`, including `j < n`, are met at `n = 4`, `k = 2`, `m = 2`; and `baranyai` without
+`0 < k`, `choose_mul` without `0 < n` and `weight_eq` without `j < n` still hold. `scratch/Ax.lean` and `scratch/ax.out` are the `#print axioms` runs
 recorded during development.
 
 ## Build
@@ -73,6 +77,7 @@ lake build
 ./gate.sh
 bash tests/tamper.sh
 lake env lean scratch/Satisfiable.lean
+lake env lean scratch/Referee.lean
 ```
 
 Toolchain: Lean `v4.33.1`, Mathlib `v4.33.1` (revision pinned in `lake-manifest.json`).

@@ -101,4 +101,30 @@ theorem baranyai_partition [Fintype α] [DecidableEq α] (n k : ℕ) (hk : 0 < k
     classes_cover c, fun i => ?_, num_classes hk hn hkn⟩
   rw [class_card hk hc i, hα]
 
+/-- Converse: if some colour class of a colouring of the `k`-subsets of `α` covers every vertex
+exactly once, then `k ∣ |α|`. So `k ∣ n` is necessary in `baranyai` (when there is a colour). -/
+theorem dvd_card_of_factorisation [Fintype α] [DecidableEq α] {k M : ℕ}
+    {c : {S : Finset α // S.card = k} → Fin M}
+    (hc : ∃ i, ∀ v : α, ∃! S : {S : Finset α // S.card = k}, c S = i ∧ v ∈ S.1) :
+    k ∣ Fintype.card α := by
+  obtain ⟨i, hi⟩ := hc
+  set F := univ.filter fun S : {S : Finset α // S.card = k} => c S = i with hF
+  have h1 : ∑ S ∈ F, S.1.card = F.card * k := sum_const_nat (fun S _ => S.2)
+  have h2 : ∑ S ∈ F, S.1.card = ∑ v : α, (F.filter fun S => v ∈ S.1).card := by
+    calc ∑ S ∈ F, S.1.card = ∑ S ∈ F, ∑ v : α, if v ∈ S.1 then 1 else 0 :=
+          sum_congr rfl fun S _ => by rw [sum_boole]; simp
+      _ = ∑ v : α, ∑ S ∈ F, if v ∈ S.1 then 1 else 0 := sum_comm
+      _ = ∑ v : α, (F.filter fun S => v ∈ S.1).card :=
+          sum_congr rfl fun v _ => by rw [sum_boole]; simp
+  have h3 : ∀ v : α, (F.filter fun S => v ∈ S.1).card = 1 := by
+    intro v
+    obtain ⟨U, hU, hu⟩ := hi v
+    refine card_eq_one.2 ⟨U, ?_⟩
+    ext S
+    simp only [hF, mem_filter, mem_univ, true_and, mem_singleton]
+    exact ⟨fun h => hu S h, fun h => h ▸ hU⟩
+  refine ⟨F.card, ?_⟩
+  rw [mul_comm, ← h1, h2, sum_congr rfl fun v _ => h3 v]
+  simp
+
 end Baranyai
