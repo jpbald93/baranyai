@@ -1,0 +1,5 @@
+'baranyai' depends on axioms: [propext, Classical.choice, Quot.sound]
+'baranyai'' depends on axioms: [propext, Classical.choice, Quot.sound]
+'complete_graph_one_factorisation' depends on axioms: [propext, Classical.choice, Quot.sound]
+'baranyai_four_two' depends on axioms: [propext, Classical.choice, Quot.sound]
+'Baranyai.step' depends on axioms: [propext, Classical.choice, Quot.sound]
