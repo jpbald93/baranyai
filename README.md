@@ -9,7 +9,7 @@ The proof is Baranyai's vertex-by-vertex induction. The integral step uses Hall'
 theorem from Mathlib, with Hall's condition derived by double counting from the fractional
 assignment, so no max-flow integrality theorem is needed.
 
-**Status:** all statements are proved with no `sorry`. `gate.sh` checks 32 named declarations.
+**Status:** all statements are proved with no `sorry`. `gate.sh` checks 76 named declarations.
 
 ## Main statements
 
@@ -31,7 +31,7 @@ not reprove it.
 
 ## Verification
 
-- `./gate.sh` builds the library and generates its own `#print axioms` queries for the 32
+- `./gate.sh` builds the library and generates its own `#print axioms` queries for the 76
   named declarations: every public theorem and definition in the library, fully qualified. The
   queries come from the gate itself, not from a file in the repository. The gate fails if:
   - a source file contains `sorry`, `admit`, `native_decide`, `axiom`, `#eval`, `run_cmd`,
@@ -41,7 +41,7 @@ not reprove it.
   - a named declaration depends on anything other than `propext`, `Classical.choice` and
     `Quot.sound`.
 
-  On success it prints `PASS (32 declarations, standard axioms only)`.
+  On success it prints `PASS (76 declarations, standard axioms only)`.
 - `bash tests/tamper.sh` plants six kinds of fake proof in scratch copies and checks that the
   gate rejects each one:
   1. a `sorry`;
@@ -67,6 +67,23 @@ two-colour factorisation exists for `n = 3`, `k = 2` (by `decide`); the hypothes
 `Baranyai.step`, including `j < n`, are met at `n = 4`, `k = 2`, `m = 2`; and `baranyai` without
 `0 < k`, `choose_mul` without `0 < n` and `weight_eq` without `j < n` still hold. `scratch/Ax.lean` and `scratch/ax.out` are the `#print axioms` runs
 recorded during development.
+
+## Layers 14 and 15
+
+`Baranyai/L14.lean` restates the main theorems (`baranyai`, `baranyai'`,
+`complete_graph_one_factorisation`, `baranyai_four_two`, `baranyai_of_card`, `baranyai_finset`,
+`baranyai_partition`, `dvd_card_of_factorisation`) in types that mention only Mathlib notions
+(`Finpartition`, `SimpleGraph.Subgraph.IsPerfectMatching`, ...). It also gives explicit small
+witnesses showing that the conclusions are non-degenerate: 8 `l14_*` restatements and 9 `l14w_*`
+witnesses, 17 declarations in all.
+
+`Baranyai/L15Classical.lean` (namespace `Baranyai.Classical`) reproduces verbatim 4 definitions
+and 8 textbook statements that were written independently by an AI model that did not see this
+code. It proves 7 of the statements outright. For the general almost-regular form (van
+Lint–Wilson Thm 38.1, `classical_Baranyai3_main`), which is kept as a `Prop` and is not
+formalised in general, it proves only the divisible equal-size instance. In all it adds 27
+declarations: 8 `cov_*` theorems, 7 bridge lemmas and definitions, and the 12 writer
+declarations. None of the writer's statements turned out to be false.
 
 ## Build
 
